@@ -37,8 +37,9 @@
 
 ### 2. 불필요한 코드 제거 (작동 변경 없음)
 
-- [ ] `OrderController`에서 미사용 `WishRepository` 의존성 제거
+- [x] `OrderController`에서 미사용 `WishRepository` 의존성 제거
   - 필드, 생성자 파라미터, import 모두 제거 (주석 "6. cleanup wish"도 함께 제거)
+  - 근거: 주석에 위시 정리 의도가 있으나 실제 구현이 없는 미사용 의존성이므로, 제거하여 불필요한 빈 주입과 혼란을 방지한다.
 - [ ] `OptionController`에서 `import java.util.stream.Collectors` 제거 (`.toList()` 전환 후)
 - [ ] 각 Controller의 중복 `@ExceptionHandler` 제거 대비 확인
   - `ProductController`, `OptionController`, `MemberController`에 동일한 `IllegalArgumentException` 핸들러 존재

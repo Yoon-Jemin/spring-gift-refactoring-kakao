@@ -6,7 +6,6 @@ import gift.member.MemberRepository;
 import gift.option.Option;
 import gift.option.OptionRepository;
 import gift.product.Product;
-import gift.wish.WishRepository;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,6 @@ import java.net.URI;
 public class OrderController {
     private final OrderRepository orderRepository;
     private final OptionRepository optionRepository;
-    private final WishRepository wishRepository;
     private final MemberRepository memberRepository;
     private final AuthenticationResolver authenticationResolver;
     private final KakaoMessageClient kakaoMessageClient;
@@ -34,14 +32,12 @@ public class OrderController {
     public OrderController(
         OrderRepository orderRepository,
         OptionRepository optionRepository,
-        WishRepository wishRepository,
         MemberRepository memberRepository,
         AuthenticationResolver authenticationResolver,
         KakaoMessageClient kakaoMessageClient
     ) {
         this.orderRepository = orderRepository;
         this.optionRepository = optionRepository;
-        this.wishRepository = wishRepository;
         this.memberRepository = memberRepository;
         this.authenticationResolver = authenticationResolver;
         this.kakaoMessageClient = kakaoMessageClient;
@@ -68,8 +64,7 @@ public class OrderController {
      * 3. subtract stock
      * 4. deduct points
      * 5. save order
-     * 6. cleanup wish
-     * 7. send kakao notification
+     * 6. send kakao notification
      */
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
