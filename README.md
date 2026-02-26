@@ -48,9 +48,10 @@
 
 ### 3. 서비스 계층 추출 (구조 변경, 작동 변경 없음)
 
-- [ ] **ProductService** 추출
+- [x] **ProductService** 추출
   - `ProductController`의 상품 CRUD 로직 (이름 검증, 카테고리 조회, 생성/수정/삭제)
   - `AdminProductController`의 상품 CRUD 로직 (동일 로직 중복 제거)
+  - 근거: 두 컨트롤러에 분산된 상품 비즈니스 로직을 `ProductService`로 통합하여 중복을 제거하고, 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 분리한다.
 - [ ] **CategoryService** 추출
   - `CategoryController`의 카테고리 CRUD 로직 (조회, 생성, 수정, 삭제)
 - [ ] **MemberService** 추출
