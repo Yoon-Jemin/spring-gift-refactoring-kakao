@@ -65,8 +65,13 @@
 - [x] **OrderService** 추출 (`@Transactional` 적용)
   - `OrderController`의 주문 생성 로직 (재고 차감 → 포인트 차감 → 주문 저장 → 카카오 메시지)
   - 근거: 주문 생성 시 재고 차감·포인트 차감·주문 저장이 원자적으로 처리되어야 하므로 `@Transactional`을 적용한 서비스로 추출하고, 컨트롤러는 인증 확인과 HTTP 응답 처리만 담당하도록 분리한다.
-- [ ] **WishService** 추출
+- [x] **WishService** 추출
   - `WishController`의 위시리스트 조회/추가/삭제 로직 (중복 확인, 소유권 검증)
+  - 근거: `WishController`의 비즈니스 로직을 `WishService`로 추출하여 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 분리한다. 소유권 검증 실패(403)를 예외 기반으로 처리하기 위해 `ForbiddenException`을 추가하고 `GlobalExceptionHandler`에 핸들러를 등록한다. `addWish`의 중복 확인·생성 분기는 HTTP 상태 코드 분기가 아닌 비즈니스 규칙이므로 서비스 내부에서 멱등하게 처리하고, 컨트롤러는 항상 200 OK를 반환하도록 단순화한다.
+- [ ] **KakaoAuthController** 리팩터링
+  - `MemberRepository`를 직접 사용하여 회원 조회·저장·카카오 액세스 토큰 업데이트를 수행하고 있음
+- [ ] **AdminProductController** 리팩터링
+  - `CategoryRepository`를 직접 사용하여 카테고리 목록을 조회하고 있음
 - [ ] 각 Controller가 요청 검증 + Service 위임만 수행하는지 최종 확인
 
 ---

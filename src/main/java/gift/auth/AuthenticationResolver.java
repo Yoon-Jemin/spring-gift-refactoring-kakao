@@ -1,5 +1,6 @@
 package gift.auth;
 
+import gift.exception.UnauthorizedException;
 import gift.member.Member;
 import gift.member.MemberRepository;
 import org.springframework.stereotype.Component;
