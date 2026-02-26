@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * Option names are validated against allowed characters and length constraints.
  */
 @RestController
-@RequestMapping(path = "/api/products/{productId}/options")
+@RequestMapping("/api/products/{productId}/options")
 public class OptionController {
     private final OptionRepository optionRepository;
     private final ProductRepository productRepository;
