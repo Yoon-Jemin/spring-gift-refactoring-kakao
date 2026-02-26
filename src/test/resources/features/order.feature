@@ -19,12 +19,12 @@ Feature: 주문하기
 
   Scenario: 재고보다 많은 수량을 주문하면 에러가 발생한다
     When "ICE" 옵션 11개를 주문하면
-    Then 응답 상태 코드는 500이다
+    Then 응답 상태 코드는 400이다
 
   Scenario: 포인트가 부족하면 에러가 발생한다
     Given 포인트 100을 가진 회원 "poor@test.com"이 등록되어 있고
     When "poor@test.com" 회원이 "ICE" 옵션 1개를 주문하면
-    Then 응답 상태 코드는 500이다
+    Then 응답 상태 코드는 400이다
 
   Scenario: 인증 없이 주문하면 400 에러가 발생한다
     When 인증 없이 주문하면

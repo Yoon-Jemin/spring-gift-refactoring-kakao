@@ -42,8 +42,9 @@
   - 근거: 주석에 위시 정리 의도가 있으나 실제 구현이 없는 미사용 의존성이므로, 제거하여 불필요한 빈 주입과 혼란을 방지한다.
 - [x] `OptionController`에서 `import java.util.stream.Collectors` 제거 (`.toList()` 전환 후)
   - 근거: `.toList()` 전환으로 `Collectors` 클래스를 더 이상 참조하지 않으므로, 미사용 import를 제거하여 불필요한 의존을 없앤다.
-- [ ] 각 Controller의 중복 `@ExceptionHandler` 제거 대비 확인
-  - `ProductController`, `OptionController`, `MemberController`에 동일한 `IllegalArgumentException` 핸들러 존재
+- [x] 각 Controller의 중복 `@ExceptionHandler` 제거
+  - `ProductController`, `OptionController`, `MemberController`의 동일한 `IllegalArgumentException` 핸들러를 `GlobalExceptionHandler`(`@RestControllerAdvice`)로 통합
+  - 근거: 동일한 예외 처리 로직이 3개 컨트롤러에 중복되어 있으므로, `@RestControllerAdvice`로 한 곳에서 관리하여 변경 시 누락 위험을 없앤다.
 
 ### 3. 서비스 계층 추출 (구조 변경, 작동 변경 없음)
 
