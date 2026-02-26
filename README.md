@@ -31,8 +31,9 @@
 - [x] 에러 메시지 언어 통일 — 영어 메시지를 한국어로 통일
   - 대상: `MemberController`, `AdminMemberController`, `Member`
   - 근거: Validator와 도메인 로직 대부분이 이미 한국어 메시지를 사용하므로, 나머지 영어 메시지도 한국어로 통일하여 사용자에게 일관된 오류 안내를 제공한다.
-- [ ] `ResponseEntity` 제네릭 타입 통일 — `ResponseEntity<?>` 대신 구체적 타입 사용
-  - 대상: `OrderController`
+- [x] `ResponseEntity` 제네릭 타입 통일 — `ResponseEntity<?>` 대신 구체적 타입 사용
+  - 대상: `OrderController`의 `getOrders`(`Page<OrderResponse>`), `createOrder`(`OrderResponse`)
+  - 근거: 와일드카드(`?`)는 반환 타입 정보를 숨겨 API 문서 자동 생성이나 호출부에서 타입 추론이 불가능하므로, 구체적 제네릭 타입을 명시하여 컴파일 타임 타입 안전성과 가독성을 높인다.
 
 ### 2. 불필요한 코드 제거 (작동 변경 없음)
 
