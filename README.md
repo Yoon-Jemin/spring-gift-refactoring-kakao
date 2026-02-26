@@ -62,8 +62,9 @@
 - [x] **OptionService** 추출
   - `OptionController`의 옵션 CRUD 로직 (이름 검증, 중복 확인, 최소 1개 보장 규칙)
   - 근거: `OptionController`가 `OptionRepository`·`ProductRepository`를 직접 사용하며 이름 검증, 중복 확인, 최소 1개 보장 등 비즈니스 로직을 수행하고 있으므로, `OptionService`로 추출하여 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 분리한다.
-- [ ] **OrderService** 추출 (`@Transactional` 적용)
+- [x] **OrderService** 추출 (`@Transactional` 적용)
   - `OrderController`의 주문 생성 로직 (재고 차감 → 포인트 차감 → 주문 저장 → 카카오 메시지)
+  - 근거: 주문 생성 시 재고 차감·포인트 차감·주문 저장이 원자적으로 처리되어야 하므로 `@Transactional`을 적용한 서비스로 추출하고, 컨트롤러는 인증 확인과 HTTP 응답 처리만 담당하도록 분리한다.
 - [ ] **WishService** 추출
   - `WishController`의 위시리스트 조회/추가/삭제 로직 (중복 확인, 소유권 검증)
 - [ ] 각 Controller가 요청 검증 + Service 위임만 수행하는지 최종 확인
