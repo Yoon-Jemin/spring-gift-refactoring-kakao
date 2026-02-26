@@ -25,12 +25,12 @@
 - [x] HTTP 상태 코드 표현 통일 — 매직 넘버(`401`, `403`) 대신 `HttpStatus` 열거형 사용
   - 대상: `WishController`, `OrderController`
   - 근거: 매직 넘버는 의미를 즉시 파악하기 어려우므로, `HttpStatus.UNAUTHORIZED`·`HttpStatus.FORBIDDEN` 열거형으로 대체하여 의도를 명확히 한다.
-- [ ] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일
+- [x] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일
   - 대상: `OptionController`
   - 근거: Java 16+의 `.toList()`는 불변 리스트를 반환하며 내부 최적화가 적용되어 더 간결하고 효율적이다. 수집한 리스트를 응답으로 반환만 하므로 가변성이 불필요하여 안전하게 전환할 수 있다.
-- [ ] 에러 메시지 언어 통일 — 한국어 또는 영어 중 하나로 통일
-  - 한국어: `AdminProductController`, `OptionController`, `Member`, 각 Validator
-  - 영어: `MemberController`, `AdminMemberController`, `Member` 일부
+- [x] 에러 메시지 언어 통일 — 영어 메시지를 한국어로 통일
+  - 대상: `MemberController`, `AdminMemberController`, `Member`
+  - 근거: Validator와 도메인 로직 대부분이 이미 한국어 메시지를 사용하므로, 나머지 영어 메시지도 한국어로 통일하여 사용자에게 일관된 오류 안내를 제공한다.
 - [ ] `ResponseEntity` 제네릭 타입 통일 — `ResponseEntity<?>` 대신 구체적 타입 사용
   - 대상: `OrderController`
 
