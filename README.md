@@ -10,13 +10,15 @@
 
 ### 1. 스타일 정리 (작동 변경 없음)
 
-- [ ] `@Autowired` 제거 통일 — 단일 생성자 빈에서 불필요한 `@Autowired` 제거
+- [x] `@Autowired` 제거 통일 — 단일 생성자 빈에서 불필요한 `@Autowired` 제거
   - 대상: `MemberController`, `AdminMemberController`, `AuthenticationResolver`, `JwtProvider`
-- [ ] `@RequestMapping` 속성 스타일 통일 — `path = "/..."` 대신 `"/..."` 축약형으로 통일
+  - 근거: Spring 4.3+부터 단일 생성자 빈은 `@Autowired` 없이도 자동 주입되므로 불필요한 어노테이션을 제거하여 코드 노이즈를 줄인다.
+- [x] `@RequestMapping` 속성 스타일 통일 — `path = "/..."` 대신 `"/..."` 축약형으로 통일
   - 대상: `KakaoAuthController`, `OptionController`
-- [ ] 변수 선언 스타일 통일 — `var` 또는 명시적 타입 중 하나로 통일, 불필요한 `final` 제거
-  - `var` 사용: `OrderController`, `WishController`
-  - 명시적 타입 + `final` 사용: `MemberController`, `AdminMemberController`, `AuthenticationResolver`
+  - 근거: `value`가 기본 속성이므로 `path = "..."` 명시는 불필요한 장식이며, 축약형으로 통일하여 일관성을 높인다.
+- [x] 변수 선언 스타일 통일 — `var` 제거 후 명시적 타입으로 통일, 불필요한 `final` 제거
+  - 대상: `OrderController`, `WishController`, `MemberController`, `AdminMemberController`, `AuthenticationResolver`
+  - 근거: 명시적 타입 선언으로 가독성을 높이고, 지역 변수의 `final`은 재할당 방지 실익이 적어 제거하여 선언부를 간결하게 한다.
 - [ ] 주석/Javadoc 스타일 통일 — Javadoc(`/** */`) 또는 블록 주석(`/* */`) 중 하나로 통일
   - Javadoc 사용: `member` 패키지, `auth` 패키지 일부
   - 블록 주석 사용: `OptionController`, `KakaoAuthController`, `OptionNameValidator`
