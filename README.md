@@ -27,7 +27,7 @@
   - 근거: 매직 넘버는 의미를 즉시 파악하기 어려우므로, `HttpStatus.UNAUTHORIZED`·`HttpStatus.FORBIDDEN` 열거형으로 대체하여 의도를 명확히 한다.
 - [x] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일
   - 대상: `OptionController`
-  - 근거: Java 16+의 `.toList()`는 불변 리스트를 반환하며 내부 최적화가 적용되어 더 간결하고 효율적이다. 수집한 리스트를 응답으로 반환만 하므로 가변성이 불필요하여 안전하게 전환할 수 있다.
+  - 근거: `.toList()`는 불변 리스트를 반환하며 내부 최적화가 적용되어 더 간결하고 효율적이다. 수집한 리스트를 응답으로 반환만 하므로 가변성이 불필요하여 안전하게 전환할 수 있다.
 - [x] 에러 메시지 언어 통일 — 영어 메시지를 한국어로 통일
   - 대상: `MemberController`, `AdminMemberController`, `Member`
   - 근거: Validator와 도메인 로직 대부분이 이미 한국어 메시지를 사용하므로, 나머지 영어 메시지도 한국어로 통일하여 사용자에게 일관된 오류 안내를 제공한다.
@@ -40,7 +40,8 @@
 - [x] `OrderController`에서 미사용 `WishRepository` 의존성 제거
   - 필드, 생성자 파라미터, import 모두 제거 (주석 "6. cleanup wish"도 함께 제거)
   - 근거: 주석에 위시 정리 의도가 있으나 실제 구현이 없는 미사용 의존성이므로, 제거하여 불필요한 빈 주입과 혼란을 방지한다.
-- [ ] `OptionController`에서 `import java.util.stream.Collectors` 제거 (`.toList()` 전환 후)
+- [x] `OptionController`에서 `import java.util.stream.Collectors` 제거 (`.toList()` 전환 후)
+  - 근거: `.toList()` 전환으로 `Collectors` 클래스를 더 이상 참조하지 않으므로, 미사용 import를 제거하여 불필요한 의존을 없앤다.
 - [ ] 각 Controller의 중복 `@ExceptionHandler` 제거 대비 확인
   - `ProductController`, `OptionController`, `MemberController`에 동일한 `IllegalArgumentException` 핸들러 존재
 
