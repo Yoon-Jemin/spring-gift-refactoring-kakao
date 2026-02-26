@@ -42,11 +42,7 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         Pageable pageable
     ) {
-        /** check auth */
         Member member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
         Page<WishResponse> wishes = wishRepository.findByMemberId(member.getId(), pageable).map(WishResponse::from);
         return ResponseEntity.ok(wishes);
     }
@@ -56,11 +52,7 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody WishRequest request
     ) {
-        /** check auth */
         Member member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         /** check product */
         Product product = productRepository.findById(request.productId()).orElse(null);
@@ -84,11 +76,7 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         @PathVariable Long id
     ) {
-        /** check auth */
         Member member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         Wish wish = wishRepository.findById(id).orElse(null);
         if (wish == null) {
