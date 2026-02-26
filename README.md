@@ -27,6 +27,7 @@
   - 근거: 매직 넘버는 의미를 즉시 파악하기 어려우므로, `HttpStatus.UNAUTHORIZED`·`HttpStatus.FORBIDDEN` 열거형으로 대체하여 의도를 명확히 한다.
 - [ ] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일
   - 대상: `OptionController`
+  - 근거: Java 16+의 `.toList()`는 불변 리스트를 반환하며 내부 최적화가 적용되어 더 간결하고 효율적이다. 수집한 리스트를 응답으로 반환만 하므로 가변성이 불필요하여 안전하게 전환할 수 있다.
 - [ ] 에러 메시지 언어 통일 — 한국어 또는 영어 중 하나로 통일
   - 한국어: `AdminProductController`, `OptionController`, `Member`, 각 Validator
   - 영어: `MemberController`, `AdminMemberController`, `Member` 일부

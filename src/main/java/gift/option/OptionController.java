@@ -40,7 +40,7 @@ public class OptionController {
         }
         List<OptionResponse> options = optionRepository.findByProductId(productId).stream()
             .map(OptionResponse::from)
-            .collect(Collectors.toList());
+            .toList();
         return ResponseEntity.ok(options);
     }
 
