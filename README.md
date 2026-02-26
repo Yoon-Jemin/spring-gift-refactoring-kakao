@@ -68,8 +68,9 @@
 - [x] **WishService** 추출
   - `WishController`의 위시리스트 조회/추가/삭제 로직 (중복 확인, 소유권 검증)
   - 근거: `WishController`의 비즈니스 로직을 `WishService`로 추출하여 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 분리한다. 소유권 검증 실패(403)를 예외 기반으로 처리하기 위해 `ForbiddenException`을 추가하고 `GlobalExceptionHandler`에 핸들러를 등록한다. `addWish`의 중복 확인·생성 분기는 HTTP 상태 코드 분기가 아닌 비즈니스 규칙이므로 서비스 내부에서 멱등하게 처리하고, 컨트롤러는 항상 200 OK를 반환하도록 단순화한다.
-- [ ] **KakaoAuthController** 리팩터링
+- [x] **KakaoAuthController** 리팩터링
   - `MemberRepository`를 직접 사용하여 회원 조회·저장·카카오 액세스 토큰 업데이트를 수행하고 있음
+  - 근거: `KakaoAuthController`가 `MemberRepository`를 직접 사용하여 회원 조회·생성·카카오 토큰 업데이트를 수행하고 있으므로, `MemberService`에 `findOrCreateByKakaoLogin` 메서드를 추가하고 컨트롤러는 서비스에 위임하도록 변경하여 회원 관련 영속성 로직을 한 곳에서 관리한다.
 - [ ] **AdminProductController** 리팩터링
   - `CategoryRepository`를 직접 사용하여 카테고리 목록을 조회하고 있음
 - [ ] 각 Controller가 요청 검증 + Service 위임만 수행하는지 최종 확인
