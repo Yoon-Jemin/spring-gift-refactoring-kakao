@@ -52,8 +52,9 @@
   - `ProductController`의 상품 CRUD 로직 (이름 검증, 카테고리 조회, 생성/수정/삭제)
   - `AdminProductController`의 상품 CRUD 로직 (동일 로직 중복 제거)
   - 근거: 두 컨트롤러에 분산된 상품 비즈니스 로직을 `ProductService`로 통합하여 중복을 제거하고, 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 분리한다.
-- [ ] **CategoryService** 추출
+- [x] **CategoryService** 추출
   - `CategoryController`의 카테고리 CRUD 로직 (조회, 생성, 수정, 삭제)
+  - 근거: `CategoryController`가 `CategoryRepository`를 직접 사용하던 구조에서 `CategoryService`를 추출하여 비즈니스 로직을 분리하고, 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 나눈다. `updateCategory`의 null 체크 패턴을 `orElseThrow`로 교체하여 `GlobalExceptionHandler`와 일관된 예외 처리를 적용한다.
 - [ ] **MemberService** 추출
   - `MemberController`의 회원 가입/로그인 로직
   - `AdminMemberController`의 회원 관리/포인트 충전 로직
