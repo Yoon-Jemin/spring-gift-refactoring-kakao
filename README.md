@@ -55,9 +55,10 @@
 - [x] **CategoryService** 추출
   - `CategoryController`의 카테고리 CRUD 로직 (조회, 생성, 수정, 삭제)
   - 근거: `CategoryController`가 `CategoryRepository`를 직접 사용하던 구조에서 `CategoryService`를 추출하여 비즈니스 로직을 분리하고, 컨트롤러는 HTTP 요청/응답 처리만 담당하도록 역할을 나눈다. `updateCategory`의 null 체크 패턴을 `orElseThrow`로 교체하여 `GlobalExceptionHandler`와 일관된 예외 처리를 적용한다.
-- [ ] **MemberService** 추출
+- [x] **MemberService** 추출
   - `MemberController`의 회원 가입/로그인 로직
   - `AdminMemberController`의 회원 관리/포인트 충전 로직
+  - 근거: 회원 가입·로그인·관리 로직을 `MemberService`로 통합하여, 컨트롤러는 HTTP/뷰 처리만 담당하고 비즈니스 로직은 서비스에서 일관되게 관리한다.
 - [ ] **OptionService** 추출
   - `OptionController`의 옵션 CRUD 로직 (이름 검증, 중복 확인, 최소 1개 보장 규칙)
 - [ ] **OrderService** 추출 (`@Transactional` 적용)
