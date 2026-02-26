@@ -71,9 +71,10 @@
 - [x] **KakaoAuthController** 리팩터링
   - `MemberRepository`를 직접 사용하여 회원 조회·저장·카카오 액세스 토큰 업데이트를 수행하고 있음
   - 근거: `KakaoAuthController`가 `MemberRepository`를 직접 사용하여 회원 조회·생성·카카오 토큰 업데이트를 수행하고 있으므로, `MemberService`에 `findOrCreateByKakaoLogin` 메서드를 추가하고 컨트롤러는 서비스에 위임하도록 변경하여 회원 관련 영속성 로직을 한 곳에서 관리한다.
-- [ ] **AdminProductController** 리팩터링
+- [x] **AdminProductController** 리팩터링
   - `CategoryRepository`를 직접 사용하여 카테고리 목록을 조회하고 있음
-- [ ] 각 Controller가 요청 검증 + Service 위임만 수행하는지 최종 확인
+  - 근거: `AdminProductController`가 `CategoryRepository`를 직접 사용하여 카테고리 목록을 조회하고 있으므로, 이미 존재하는 `CategoryService.getCategories()`에 위임하도록 변경하여 컨트롤러가 Repository에 직접 의존하지 않도록 한다.
+- [x] 각 Controller가 요청 검증 + Service 위임만 수행하는지 최종 확인
 
 ---
 
