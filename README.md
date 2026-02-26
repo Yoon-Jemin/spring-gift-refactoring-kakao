@@ -22,8 +22,9 @@
 - [x] 주석/Javadoc 스타일 통일 — Javadoc(`/** */`) 또는 블록 주석(`/* */`) 중 하나로 통일
   - 대상: `WishController`, `OrderController`, `Order`, `Wish`, `Member`의 한 줄 주석(`//`)을 Javadoc(`/** */`)으로 변환
   - 근거: 기존 `member`·`auth` 패키지에서 이미 Javadoc 스타일을 사용하고 있으므로, 나머지 한 줄 주석도 Javadoc으로 통일하여 프로젝트 전체의 주석 형식을 일관되게 한다.
-- [ ] HTTP 상태 코드 표현 통일 — 매직 넘버(`401`, `403`) 대신 `HttpStatus` 열거형 사용
+- [x] HTTP 상태 코드 표현 통일 — 매직 넘버(`401`, `403`) 대신 `HttpStatus` 열거형 사용
   - 대상: `WishController`, `OrderController`
+  - 근거: 매직 넘버는 의미를 즉시 파악하기 어려우므로, `HttpStatus.UNAUTHORIZED`·`HttpStatus.FORBIDDEN` 열거형으로 대체하여 의도를 명확히 한다.
 - [ ] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일
   - 대상: `OptionController`
 - [ ] 에러 메시지 언어 통일 — 한국어 또는 영어 중 하나로 통일
