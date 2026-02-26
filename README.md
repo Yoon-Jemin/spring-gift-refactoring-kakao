@@ -19,10 +19,9 @@
 - [x] 변수 선언 스타일 통일 — `var` 제거 후 명시적 타입으로 통일, 불필요한 `final` 제거
   - 대상: `OrderController`, `WishController`, `MemberController`, `AdminMemberController`, `AuthenticationResolver`
   - 근거: 명시적 타입 선언으로 가독성을 높이고, 지역 변수의 `final`은 재할당 방지 실익이 적어 제거하여 선언부를 간결하게 한다.
-- [ ] 주석/Javadoc 스타일 통일 — Javadoc(`/** */`) 또는 블록 주석(`/* */`) 중 하나로 통일
-  - Javadoc 사용: `member` 패키지, `auth` 패키지 일부
-  - 블록 주석 사용: `OptionController`, `KakaoAuthController`, `OptionNameValidator`
-  - 주석 없음: `category`, `product`, `order`, `wish` 대부분
+- [x] 주석/Javadoc 스타일 통일 — Javadoc(`/** */`) 또는 블록 주석(`/* */`) 중 하나로 통일
+  - 대상: `WishController`, `OrderController`, `Order`, `Wish`, `Member`의 한 줄 주석(`//`)을 Javadoc(`/** */`)으로 변환
+  - 근거: 기존 `member`·`auth` 패키지에서 이미 Javadoc 스타일을 사용하고 있으므로, 나머지 한 줄 주석도 Javadoc으로 통일하여 프로젝트 전체의 주석 형식을 일관되게 한다.
 - [ ] HTTP 상태 코드 표현 통일 — 매직 넘버(`401`, `403`) 대신 `HttpStatus` 열거형 사용
   - 대상: `WishController`, `OrderController`
 - [ ] Stream 종결 연산 통일 — `.collect(Collectors.toList())` → `.toList()`로 통일

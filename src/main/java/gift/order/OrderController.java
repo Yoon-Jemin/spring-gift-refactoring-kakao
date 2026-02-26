@@ -51,7 +51,7 @@ public class OrderController {
         @RequestHeader("Authorization") String authorization,
         Pageable pageable
     ) {
-        // auth check
+        /** auth check */
         Member member = authenticationResolver.extractMember(authorization);
         if (member == null) {
             return ResponseEntity.status(401).build();
@@ -60,44 +60,46 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    // order flow:
-    // 1. auth check
-    // 2. validate option
-    // 3. subtract stock
-    // 4. deduct points
-    // 5. save order
-    // 6. cleanup wish
-    // 7. send kakao notification
+    /**
+     * order flow:
+     * 1. auth check
+     * 2. validate option
+     * 3. subtract stock
+     * 4. deduct points
+     * 5. save order
+     * 6. cleanup wish
+     * 7. send kakao notification
+     */
     @PostMapping
     public ResponseEntity<?> createOrder(
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody OrderRequest request
     ) {
-        // auth check
+        /** auth check */
         Member member = authenticationResolver.extractMember(authorization);
         if (member == null) {
             return ResponseEntity.status(401).build();
         }
 
-        // validate option
+        /** validate option */
         Option option = optionRepository.findById(request.optionId()).orElse(null);
         if (option == null) {
             return ResponseEntity.notFound().build();
         }
 
-        // subtract stock
+        /** subtract stock */
         option.subtractQuantity(request.quantity());
         optionRepository.save(option);
 
-        // deduct points
+        /** deduct points */
         int price = option.getProduct().getPrice() * request.quantity();
         member.deductPoint(price);
         memberRepository.save(member);
 
-        // save order
+        /** save order */
         Order saved = orderRepository.save(new Order(option, member.getId(), request.quantity(), request.message()));
 
-        // best-effort kakao notification
+        /** best-effort kakao notification */
         sendKakaoMessageIfPossible(member, saved, option);
         return ResponseEntity.created(URI.create("/api/orders/" + saved.getId()))
             .body(OrderResponse.from(saved));
