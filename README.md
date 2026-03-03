@@ -227,24 +227,14 @@ Spring 컨텍스트 없이 순수 Java로 작성한다. 엔티티의 비즈니�
 
 ---
 
-## 도메인 모델 단위 테스트 작성 계획
-
-### 작성 순서
-
-| 순서 | 대상 | 케이스 수 | 이유 |
-|------|------|---------|------|
-| 1 | `MemberTest` | 7 | `OrderService.createOrder`의 포인트 차감 전제 조건 |
-| 2 | `OptionTest` | 4 | `OrderService.createOrder`의 재고 차감 전제 조건 |
-| **합계** | | **11** | |
-
-### 파일 구조
+## 도메인 모델 단위 테스트 파일 구조
 
 ```
 src/test/java/gift/
 ├── member/
-│   └── MemberTest.java          # (신규)
+│   └── MemberTest.java
 └── option/
-    └── OptionTest.java          # (신규)
+    └── OptionTest.java
 ```
 
 ---
@@ -266,39 +256,17 @@ Mockito로 Repository를 모킹하여 서비스 로직만 격리 테스트한다
 
 ---
 
-## 서비스 단위 테스트 작성 계획
-
-### 전제 조건
-
-도메인 모델 단위 테스트(`MemberTest`, `OptionTest`)를 먼저 작성하여 엔티티의 비즈니스 메서드가 올바르게 동작함을 보장한 뒤 작성한다.
-
-### 모킹 대상
-
-| 의존성 | 모킹 방식 | 이유 |
-|--------|---------|------|
-| `OptionRepository` | `@Mock` | `findById`로 옵션 조회 |
-| `MemberRepository` | `@Mock` | `save`로 포인트 차감 반영 |
-| `OrderRepository` | `@Mock` | `save`로 주문 저장 |
-| `KakaoMessageClient` | `@Mock` | 외부 API 호출 격리 |
-
-### 파일 구조
+## 서비스 단위 테스트 파일 구조
 
 ```
 src/test/java/gift/
 └── order/
-    └── OrderServiceTest.java    # (신규)
+    └── OrderServiceTest.java
 ```
 
 ---
 
 ## 인수 테스트 기능 목록
-
-### 현황
-
-| 구분 | 상태 |
-|------|------|
-| 작성 완료 | `order.feature` — 7개 시나리오 |
-| 미작성 | member, category, product, option, wish — 5개 도메인 |
 
 ### 1. 회원 (`member.feature`) — 5개 시나리오
 
@@ -357,7 +325,7 @@ src/test/java/gift/
 | 인증 없이 조회 | Authorization 헤더 없이 → 400 | [x] |
 | 존재하지 않는 상품 추가 | 없는 상품 ID → 404 | [x] |
 
-### 6. 주문 (`order.feature`) — 7개 시나리오 (작성 완료)
+### 6. 주문 (`order.feature`) — 7개 시나리오
 
 | 시나리오 | 검증 내용 | 상태 |
 |---------|----------|------|
@@ -371,60 +339,53 @@ src/test/java/gift/
 
 ---
 
-## 인수 테스트 작성 계획
-
-### 작성 순서
-
-| 순서 | Feature | 시나리오 수 | 이유 |
-|------|---------|-----------|------|
-| 1 | `member.feature` | 5 | 인증 토큰 발급의 기반, 다른 테스트의 전제 조건 |
-| 2 | `category.feature` | 5 | 상품 생성의 필수 의존 대상 |
-| 3 | `product.feature` | 8 | 옵션/위시/주문의 전제 조건, 이름 검증 규칙 포함 |
-| 4 | `option.feature` | 7 | 주문의 전제 조건, 비즈니스 규칙 다수 |
-| 5 | `wish.feature` | 7 | 인증 기반 도메인, 권한 검증 포함 |
-| **합계** | | **32** | (기존 7 + 신규 32 = 총 39) |
-
-### 공통 Step 분리
-
-기존 `OrderSteps`에 정의된 Step 중 여러 Feature에서 재사용되는 것을 `CommonSteps.java`로 분리한다.
-
-| 공통 Step | 사용하는 Feature |
-|-----------|----------------|
-| `이름이 {string}인 카테고리가 등록되어 있고` | category, product, option, wish, order |
-| `{string} 상품이 가격 {int}, 이미지 {string}로 등록되어 있고` | product, option, wish, order |
-| `재고 {int}개인 {string} 옵션이 등록되어 있고` | option, order |
-| `포인트 {int}을 가진 회원 {string}이 등록되어 있고` | wish, order |
-| `응답 상태 코드는 {int}이다` | 모든 Feature |
-
-### 파일 구조 (완성 후)
+## 인수 테스트 파일 구조
 
 ```
 src/test/java/gift/
 ├── CucumberTest.java
 ├── CucumberSpringConfiguration.java
 └── steps/
-    ├── Hooks.java              # DB 초기화 (기존)
-    ├── SharedContext.java       # 상태 공유 (기존)
-    ├── CommonSteps.java         # 공통 Step (신규 — OrderSteps에서 분리)
-    ├── MemberSteps.java         # (신규)
-    ├── CategorySteps.java       # (신규)
-    ├── ProductSteps.java        # (신규)
-    ├── OptionSteps.java         # (신규)
-    ├── WishSteps.java           # (신규)
-    └── OrderSteps.java          # (기존 — 공통 Step 분리 후 정리)
+    ├── Hooks.java              # DB 초기화
+    ├── SharedContext.java       # 상태 공유
+    ├── MemberSteps.java
+    ├── CategorySteps.java
+    ├── ProductSteps.java
+    ├── OptionSteps.java
+    ├── WishSteps.java
+    └── OrderSteps.java
 
 src/test/resources/features/
-├── member.feature               # (신규, 5개 시나리오)
-├── category.feature             # (신규, 5개 시나리오)
-├── product.feature              # (신규, 8개 시나리오)
-├── option.feature               # (신규, 7개 시나리오)
-├── wish.feature                 # (신규, 7개 시나리오)
-└── order.feature                # (기존, 7개 시나리오)
+├── member.feature               # 5개 시나리오
+├── category.feature             # 5개 시나리오
+├── product.feature              # 8개 시나리오
+├── option.feature               # 7개 시나리오
+├── wish.feature                 # 7개 시나리오
+└── order.feature                # 7개 시나리오
 ```
 
 ---
 
 ## AI 활용 기록
 
-- Claude Code를 활용하여 프로젝트 전체 코드를 분석하고 스타일 불일치, 미사용 코드, 서비스 추출 대상을 식별함
-- 분석 결과를 바탕으로 기능 목록과 구현 전략을 직접 정리하고, 작업 순서와 커밋 단위를 설계함
+### 활용 방식
+
+- **Claude Code** (Anthropic CLI)를 페어 프로그래밍 도구로 활용함
+- AI에게 한 번에 하나의 작업 단위만 지시하고, 매 결과를 직접 검토한 뒤 다음 단계로 진행함
+- AI가 생성한 코드를 그대로 수용하지 않고, 불필요한 코드 제거·시나리오 문구 수정 등을 직접 수행함
+
+### AI를 활용한 작업과 수정 내역
+
+| 작업 | AI 활용 내용 | 직접 수정한 부분 |
+|------|------------|----------------|
+| 리팩터링 대상 식별 | 프로젝트 전체 코드를 분석하여 스타일 불일치, 미사용 코드, 서비스 추출 대상 목록을 도출 | 분석 결과를 검토하고 기능 목록과 구현 전략을 직접 정리, 작업 순서와 커밋 단위를 설계 |
+| 서비스 계층 추출 | Controller에서 Service로 비즈니스 로직을 추출하는 코드 생성 | 추출된 코드의 메서드 시그니처, 예외 처리 방식, `@Transactional` 적용 범위를 검토·조정 |
+| 테스트 계획 수립 | 테스트 피라미드 기반으로 도메인 모델·서비스·인수 테스트 시나리오 목록을 초안 작성 | 시나리오 우선순위와 범위를 조정 (예: 서비스 단위 테스트는 `OrderService.createOrder`만 대상으로 한정) |
+| 테스트 코드 작성 | Cucumber Feature 파일과 Step 정의, JUnit/Mockito 단위 테스트 코드 생성 | 50자 경계값 테스트 문자열 길이 오류 수정, Steps 클래스의 미사용 필드 제거 등 직접 보정 |
+
+### 학습한 점
+
+- **리팩터링 순서의 중요성**: 스타일 정리 → 불필요한 코드 제거 → 구조 변경 순서로 진행해야 각 단계의 diff가 깨끗하게 유지되고, 구조 변경 시 노이즈가 줄어든다는 것을 체감함
+- **테스트 피라미드 설계**: 도메인 모델 단위 테스트로 핵심 규칙을 빠르게 검증하고, 인수 테스트로 API 전체 흐름을 보장하는 계층 구조가 리팩터링의 안전망으로 효과적임을 확인함
+- **AI 산출물 검증의 필요성**: AI가 생성한 경계값 테스트 문자열이 정확히 50자여서 테스트가 실패하는 사례를 통해, AI 산출물을 반드시 실행·검증해야 한다는 점을 재확인함
+- **커밋 단위 분리**: 구조 변경과 작동 변경을 한 커밋에 섞지 않고, 목적 1개로 커밋을 구성하는 습관이 코드 리뷰와 롤백에 유리함을 실감함
