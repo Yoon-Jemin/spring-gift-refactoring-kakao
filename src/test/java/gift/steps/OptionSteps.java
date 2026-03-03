@@ -22,8 +22,6 @@ public class OptionSteps {
     @Autowired
     private OptionRepository optionRepository;
 
-    private final Map<String, Option> options = new HashMap<>();
-
     @When("이름 {string}, 수량 {int}으로 옵션을 추가하면")
     public void 옵션을_추가하면(String name, int quantity) {
         Long productId = ((Number) context.getId("productId")).longValue();
