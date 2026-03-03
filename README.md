@@ -257,12 +257,12 @@ Mockito로 Repository를 모킹하여 서비스 로직만 격리 테스트한다
 
 | 테스트 케이스 | 검증 내용 | 상태 |
 |-------------|----------|------|
-| 정상 주문 생성 | 옵션 재고 차감 + 회원 포인트 차감 + 주문 저장 확인 | [ ] |
-| 존재하지 않는 옵션 | 없는 optionId → `NoSuchElementException` | [ ] |
-| 재고 부족 | 재고보다 많은 수량 → `IllegalArgumentException` (옵션의 `subtractQuantity`에서 발생) | [ ] |
-| 포인트 부족 | 잔액보다 큰 금액 → `IllegalArgumentException` (회원의 `deductPoint`에서 발생) | [ ] |
-| 카카오 토큰이 없는 회원 | `kakaoAccessToken == null` → `kakaoMessageClient.sendToMe` 미호출 | [ ] |
-| 카카오 메시지 전송 실패 | `sendToMe`에서 예외 발생 → 주문은 정상 저장 | [ ] |
+| 정상 주문 생성 | 옵션 재고 차감 + 회원 포인트 차감 + 주문 저장 확인 | [x] |
+| 존재하지 않는 옵션 | 없는 optionId → `NoSuchElementException` | [x] |
+| 재고 부족 | 재고보다 많은 수량 → `IllegalArgumentException` (옵션의 `subtractQuantity`에서 발생) | [x] |
+| 포인트 부족 | 잔액보다 큰 금액 → `IllegalArgumentException` (회원의 `deductPoint`에서 발생) | [x] |
+| 카카오 토큰이 없는 회원 | `kakaoAccessToken == null` → `kakaoMessageClient.sendToMe` 미호출 | [x] |
+| 카카오 메시지 전송 실패 | `sendToMe`에서 예외 발생 → 주문은 정상 저장 | [x] |
 
 ---
 
