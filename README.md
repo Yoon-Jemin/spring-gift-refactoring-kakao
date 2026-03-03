@@ -134,6 +134,72 @@
 
 ---
 
+## 테스트 전략
+
+### 목표
+
+리팩터링된 코드의 **정확성을 보장**하고, 이후 변경에 대한 **안전망**을 구축한다.
+
+### 테스트 피라미드
+
+```
+        ╱  인수 테스트  ╲          ← API 전체 흐름 (Cucumber + REST Assured)
+       ╱               ╲
+      ╱  서비스 단위 테스트  ╲       ← 비즈니스 로직 (Mockito)
+     ╱                    ╲
+    ╱  도메인 모델 단위 테스트   ╲    ← 핵심 규칙 (순수 Java, 의존성 없음)
+```
+
+### 1단계: 도메인 모델 단위 테스트 (우선순위 높음)
+
+Spring 컨텍스트 없이 순수 Java로 작성한다. 실행 속도가 빠르고 핵심 비즈니스 규칙을 촘촘하게 검증한다.
+
+| 대상 | 테스트 항목 |
+|---|---|
+| `Member.deductPoint()` | 정상 차감, 잔액 부족 예외, 음수/0 금액 예외, 잔액 정확히 일치 |
+| `Member.chargePoint()` | 정상 충전, 음수/0 금액 예외 |
+| `Option.subtractQuantity()` | 정상 차감, 재고 부족 예외, 재고 정확히 일치 |
+
+### 2단계: 인수 테스트 확장 (우선순위 높음)
+
+기존 Cucumber 인프라를 활용하여 Order 외 도메인으로 확장한다.
+
+| Feature | 주요 시나리오 |
+|---|---|
+| `product.feature` | 상품 CRUD, 이름 검증 실패, 존재하지 않는 카테고리 |
+| `option.feature` | 옵션 추가/삭제, 중복 이름 방지, 마지막 옵션 삭제 방지 |
+| `wish.feature` | 위시 추가/삭제, 중복 추가 멱등성, 타인 위시 삭제 시 403 |
+| `member.feature` | 회원가입, 로그인, 중복 이메일 거부 |
+| `category.feature` | 카테고리 CRUD |
+
+### 3단계: 서비스 단위 테스트 (우선순위 보통)
+
+Mockito로 Repository를 모킹하여 서비스 로직만 격리 테스트한다. 복잡한 서비스부터 작성한다.
+
+| 대상 | 테스트 항목 |
+|---|---|
+| `OrderService` | 정상 주문 생성, 재고 부족 시 실패, 포인트 부족 시 실패, 카카오 토큰 없을 때 메시지 미전송 |
+| `OptionService` | 마지막 옵션 삭제 방지, 중복 이름 검증, 존재하지 않는 상품 예외 |
+| `WishService` | 중복 위시 멱등 처리, 타인 위시 삭제 시 ForbiddenException |
+| `MemberService` | 중복 이메일 가입 거부, 비밀번호 불일치 로그인 실패 |
+
+> `CategoryService`는 단순 CRUD이므로 인수 테스트로 충분히 커버되어 단위 테스트를 생략한다.
+
+### 테스트 실행
+
+```bash
+# 전체 테스트
+./gradlew test
+
+# 단위 테스트만 (Spring 컨텍스트 불필요)
+./gradlew test --tests "gift.domain.*"
+
+# 인수 테스트만 (Cucumber)
+./gradlew test --tests "gift.CucumberTest"
+```
+
+---
+
 ## AI 활용 기록
 
 - Claude Code를 활용하여 프로젝트 전체 코드를 분석하고 스타일 불일치, 미사용 코드, 서비스 추출 대상을 식별함
