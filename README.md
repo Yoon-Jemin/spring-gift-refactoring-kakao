@@ -314,11 +314,11 @@ src/test/java/gift/
 
 | 시나리오 | 검증 내용 | 상태 |
 |---------|----------|------|
-| 카테고리 생성 | POST `/api/categories` → 201 + 카테고리 정보 | [ ] |
-| 카테고리 목록 조회 | GET `/api/categories` → 200 + 등록된 개수 확인 | [ ] |
-| 카테고리 수정 | PUT `/api/categories/{id}` → 200 + 변경된 이름 확인 | [ ] |
-| 카테고리 삭제 | DELETE `/api/categories/{id}` → 204 | [ ] |
-| 존재하지 않는 카테고리 수정 | 없는 ID로 수정 → 404 | [ ] |
+| 카테고리 생성 | POST `/api/categories` → 201 + 카테고리 정보 | [x] |
+| 카테고리 목록 조회 | GET `/api/categories` → 200 + 등록된 개수 확인 | [x] |
+| 카테고리 수정 | PUT `/api/categories/{id}` → 200 + 변경된 이름 확인 | [x] |
+| 카테고리 삭제 | DELETE `/api/categories/{id}` → 204 | [x] |
+| 존재하지 않는 카테고리 수정 | 없는 ID로 수정 → 404 | [x] |
 
 ### 3. 상품 (`product.feature`) — 8개 시나리오
 
