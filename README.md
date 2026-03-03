@@ -200,6 +200,230 @@ Mockito로 Repository를 모킹하여 서비스 로직만 격리 테스트한다
 
 ---
 
+## 도메인 모델 단위 테스트 기능 목록
+
+Spring 컨텍스트 없이 순수 Java로 작성한다. 엔티티의 비즈니스 메서드가 핵심 규칙을 올바르게 지키는지 검증한다.
+
+### 1. `Member` 단위 테스트 (`MemberTest`) — 7개 케이스
+
+| 테스트 케이스 | 검증 내용 | 상태 |
+|-------------|----------|------|
+| `chargePoint` — 정상 충전 | 1000 충전 → 포인트 1000 | [ ] |
+| `chargePoint` — 0 이하 금액 | 0 충전 → `IllegalArgumentException` | [ ] |
+| `chargePoint` — 음수 금액 | -100 충전 → `IllegalArgumentException` | [ ] |
+| `deductPoint` — 정상 차감 | 10000에서 3000 차감 → 포인트 7000 | [ ] |
+| `deductPoint` — 잔액 정확히 일치 | 5000에서 5000 차감 → 포인트 0 | [ ] |
+| `deductPoint` — 잔액 부족 | 1000에서 5000 차감 → `IllegalArgumentException` | [ ] |
+| `deductPoint` — 0 이하 금액 | 0 차감 → `IllegalArgumentException` | [ ] |
+
+### 2. `Option` 단위 테스트 (`OptionTest`) — 4개 케이스
+
+| 테스트 케이스 | 검증 내용 | 상태 |
+|-------------|----------|------|
+| `subtractQuantity` — 정상 차감 | 재고 10에서 3 차감 → 재고 7 | [ ] |
+| `subtractQuantity` — 재고 정확히 일치 | 재고 10에서 10 차감 → 재고 0 | [ ] |
+| `subtractQuantity` — 재고 부족 | 재고 5에서 10 차감 → `IllegalArgumentException` | [ ] |
+| `subtractQuantity` — 0개 차감 | 재고 변동 없음 확인 | [ ] |
+
+---
+
+## 도메인 모델 단위 테스트 작성 계획
+
+### 작성 순서
+
+| 순서 | 대상 | 케이스 수 | 이유 |
+|------|------|---------|------|
+| 1 | `MemberTest` | 7 | `OrderService.createOrder`의 포인트 차감 전제 조건 |
+| 2 | `OptionTest` | 4 | `OrderService.createOrder`의 재고 차감 전제 조건 |
+| **합계** | | **11** | |
+
+### 파일 구조
+
+```
+src/test/java/gift/
+├── member/
+│   └── MemberTest.java          # (신규)
+└── option/
+    └── OptionTest.java          # (신규)
+```
+
+---
+
+## 서비스 단위 테스트 기능 목록
+
+Mockito로 Repository를 모킹하여 서비스 로직만 격리 테스트한다. `OrderService.createOrder`만 대상으로 한다.
+
+### `OrderService.createOrder` 단위 테스트 (`OrderServiceTest`) — 6개 케이스
+
+| 테스트 케이스 | 검증 내용 | 상태 |
+|-------------|----------|------|
+| 정상 주문 생성 | 옵션 재고 차감 + 회원 포인트 차감 + 주문 저장 확인 | [ ] |
+| 존재하지 않는 옵션 | 없는 optionId → `NoSuchElementException` | [ ] |
+| 재고 부족 | 재고보다 많은 수량 → `IllegalArgumentException` (옵션의 `subtractQuantity`에서 발생) | [ ] |
+| 포인트 부족 | 잔액보다 큰 금액 → `IllegalArgumentException` (회원의 `deductPoint`에서 발생) | [ ] |
+| 카카오 토큰이 없는 회원 | `kakaoAccessToken == null` → `kakaoMessageClient.sendToMe` 미호출 | [ ] |
+| 카카오 메시지 전송 실패 | `sendToMe`에서 예외 발생 → 주문은 정상 저장 | [ ] |
+
+---
+
+## 서비스 단위 테스트 작성 계획
+
+### 전제 조건
+
+도메인 모델 단위 테스트(`MemberTest`, `OptionTest`)를 먼저 작성하여 엔티티의 비즈니스 메서드가 올바르게 동작함을 보장한 뒤 작성한다.
+
+### 모킹 대상
+
+| 의존성 | 모킹 방식 | 이유 |
+|--------|---------|------|
+| `OptionRepository` | `@Mock` | `findById`로 옵션 조회 |
+| `MemberRepository` | `@Mock` | `save`로 포인트 차감 반영 |
+| `OrderRepository` | `@Mock` | `save`로 주문 저장 |
+| `KakaoMessageClient` | `@Mock` | 외부 API 호출 격리 |
+
+### 파일 구조
+
+```
+src/test/java/gift/
+└── order/
+    └── OrderServiceTest.java    # (신규)
+```
+
+---
+
+## 인수 테스트 기능 목록
+
+### 현황
+
+| 구분 | 상태 |
+|------|------|
+| 작성 완료 | `order.feature` — 7개 시나리오 |
+| 미작성 | member, category, product, option, wish — 5개 도메인 |
+
+### 1. 회원 (`member.feature`) — 5개 시나리오
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 회원가입 성공 | POST `/api/members/register` → 201 + 토큰 발급 | [ ] |
+| 중복 이메일 회원가입 | 이미 등록된 이메일 → 400 | [ ] |
+| 로그인 성공 | POST `/api/members/login` → 200 + 토큰 발급 | [ ] |
+| 잘못된 비밀번호 로그인 | 비밀번호 불일치 → 400 | [ ] |
+| 존재하지 않는 이메일 로그인 | 미등록 이메일 → 400 | [ ] |
+
+### 2. 카테고리 (`category.feature`) — 5개 시나리오
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 카테고리 생성 | POST `/api/categories` → 201 + 카테고리 정보 | [ ] |
+| 카테고리 목록 조회 | GET `/api/categories` → 200 + 등록된 개수 확인 | [ ] |
+| 카테고리 수정 | PUT `/api/categories/{id}` → 200 + 변경된 이름 확인 | [ ] |
+| 카테고리 삭제 | DELETE `/api/categories/{id}` → 204 | [ ] |
+| 존재하지 않는 카테고리 수정 | 없는 ID로 수정 → 404 | [ ] |
+
+### 3. 상품 (`product.feature`) — 8개 시나리오
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 상품 생성 | POST `/api/products` → 201 + 상품 정보 | [ ] |
+| 상품 목록 페이징 조회 | GET `/api/products` → 200 + 등록된 개수 확인 | [ ] |
+| 상품 단건 조회 | GET `/api/products/{id}` → 200 + 이름 확인 | [ ] |
+| 상품 수정 | PUT `/api/products/{id}` → 200 + 변경된 이름/가격 확인 | [ ] |
+| 상품 삭제 | DELETE `/api/products/{id}` → 204 | [ ] |
+| 존재하지 않는 상품 조회 | 없는 ID로 조회 → 404 | [ ] |
+| 15자 초과 이름으로 생성 | 이름 길이 검증 → 400 | [ ] |
+| "카카오" 포함 이름으로 생성 | 금지어 검증 → 400 | [ ] |
+
+### 4. 옵션 (`option.feature`) — 7개 시나리오
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 옵션 추가 | POST `/api/products/{id}/options` → 201 + 옵션 정보 | [ ] |
+| 옵션 목록 조회 | GET `/api/products/{id}/options` → 200 + 등록된 개수 확인 | [ ] |
+| 중복 옵션명 추가 | 같은 이름의 옵션 → 400 | [ ] |
+| 옵션 삭제 (2개 이상) | DELETE → 204 | [ ] |
+| 마지막 옵션 삭제 | 옵션이 1개뿐일 때 삭제 → 400 | [ ] |
+| 50자 초과 이름으로 추가 | 이름 길이 검증 → 400 | [ ] |
+| 존재하지 않는 상품에 추가 | 없는 상품 ID → 404 | [ ] |
+
+### 5. 위시리스트 (`wish.feature`) — 7개 시나리오
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 위시 추가 | POST `/api/wishes` → 200 + 위시 정보 | [ ] |
+| 중복 위시 추가 | 이미 있는 상품 → 기존 위시 반환 (멱등) | [ ] |
+| 위시 목록 조회 | GET `/api/wishes` → 200 + 등록된 개수 확인 | [ ] |
+| 위시 삭제 | DELETE `/api/wishes/{id}` → 204 | [ ] |
+| 타인의 위시 삭제 | 다른 회원의 위시 삭제 → 403 | [ ] |
+| 인증 없이 조회 | Authorization 헤더 없이 → 400 | [ ] |
+| 존재하지 않는 상품 추가 | 없는 상품 ID → 404 | [ ] |
+
+### 6. 주문 (`order.feature`) — 7개 시나리오 (작성 완료)
+
+| 시나리오 | 검증 내용 | 상태 |
+|---------|----------|------|
+| 유효한 주문 | 201 + 재고 차감 + 포인트 차감 | [x] |
+| 존재하지 않는 옵션으로 주문 | 404 | [x] |
+| 재고 초과 주문 | 400 | [x] |
+| 포인트 부족 주문 | 400 | [x] |
+| 인증 없이 주문 | 400 | [x] |
+| 재고와 동일한 수량 주문 | 201 + 재고 0 | [x] |
+| 주문 후 목록 조회 | 200 + 주문 내역 포함 | [x] |
+
+---
+
+## 인수 테스트 작성 계획
+
+### 작성 순서
+
+| 순서 | Feature | 시나리오 수 | 이유 |
+|------|---------|-----------|------|
+| 1 | `member.feature` | 5 | 인증 토큰 발급의 기반, 다른 테스트의 전제 조건 |
+| 2 | `category.feature` | 5 | 상품 생성의 필수 의존 대상 |
+| 3 | `product.feature` | 8 | 옵션/위시/주문의 전제 조건, 이름 검증 규칙 포함 |
+| 4 | `option.feature` | 7 | 주문의 전제 조건, 비즈니스 규칙 다수 |
+| 5 | `wish.feature` | 7 | 인증 기반 도메인, 권한 검증 포함 |
+| **합계** | | **32** | (기존 7 + 신규 32 = 총 39) |
+
+### 공통 Step 분리
+
+기존 `OrderSteps`에 정의된 Step 중 여러 Feature에서 재사용되는 것을 `CommonSteps.java`로 분리한다.
+
+| 공통 Step | 사용하는 Feature |
+|-----------|----------------|
+| `이름이 {string}인 카테고리가 등록되어 있고` | category, product, option, wish, order |
+| `{string} 상품이 가격 {int}, 이미지 {string}로 등록되어 있고` | product, option, wish, order |
+| `재고 {int}개인 {string} 옵션이 등록되어 있고` | option, order |
+| `포인트 {int}을 가진 회원 {string}이 등록되어 있고` | wish, order |
+| `응답 상태 코드는 {int}이다` | 모든 Feature |
+
+### 파일 구조 (완성 후)
+
+```
+src/test/java/gift/
+├── CucumberTest.java
+├── CucumberSpringConfiguration.java
+└── steps/
+    ├── Hooks.java              # DB 초기화 (기존)
+    ├── SharedContext.java       # 상태 공유 (기존)
+    ├── CommonSteps.java         # 공통 Step (신규 — OrderSteps에서 분리)
+    ├── MemberSteps.java         # (신규)
+    ├── CategorySteps.java       # (신규)
+    ├── ProductSteps.java        # (신규)
+    ├── OptionSteps.java         # (신규)
+    ├── WishSteps.java           # (신규)
+    └── OrderSteps.java          # (기존 — 공통 Step 분리 후 정리)
+
+src/test/resources/features/
+├── member.feature               # (신규, 5개 시나리오)
+├── category.feature             # (신규, 5개 시나리오)
+├── product.feature              # (신규, 8개 시나리오)
+├── option.feature               # (신규, 7개 시나리오)
+├── wish.feature                 # (신규, 7개 시나리오)
+└── order.feature                # (기존, 7개 시나리오)
+```
+
+---
+
 ## AI 활용 기록
 
 - Claude Code를 활용하여 프로젝트 전체 코드를 분석하고 스타일 불일치, 미사용 코드, 서비스 추출 대상을 식별함
