@@ -220,10 +220,10 @@ Spring 컨텍스트 없이 순수 Java로 작성한다. 엔티티의 비즈니�
 
 | 테스트 케이스 | 검증 내용 | 상태 |
 |-------------|----------|------|
-| `subtractQuantity` — 정상 차감 | 재고 10에서 3 차감 → 재고 7 | [ ] |
-| `subtractQuantity` — 재고 정확히 일치 | 재고 10에서 10 차감 → 재고 0 | [ ] |
-| `subtractQuantity` — 재고 부족 | 재고 5에서 10 차감 → `IllegalArgumentException` | [ ] |
-| `subtractQuantity` — 0개 차감 | 재고 변동 없음 확인 | [ ] |
+| `subtractQuantity` — 정상 차감 | 재고 10에서 3 차감 → 재고 7 | [x] |
+| `subtractQuantity` — 재고 정확히 일치 | 재고 10에서 10 차감 → 재고 0 | [x] |
+| `subtractQuantity` — 재고 부족 | 재고 5에서 10 차감 → `IllegalArgumentException` | [x] |
+| `subtractQuantity` — 0개 차감 | 재고 변동 없음 확인 | [x] |
 
 ---
 
