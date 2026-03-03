@@ -208,13 +208,13 @@ Spring 컨텍스트 없이 순수 Java로 작성한다. 엔티티의 비즈니�
 
 | 테스트 케이스 | 검증 내용 | 상태 |
 |-------------|----------|------|
-| `chargePoint` — 정상 충전 | 1000 충전 → 포인트 1000 | [ ] |
-| `chargePoint` — 0 이하 금액 | 0 충전 → `IllegalArgumentException` | [ ] |
-| `chargePoint` — 음수 금액 | -100 충전 → `IllegalArgumentException` | [ ] |
-| `deductPoint` — 정상 차감 | 10000에서 3000 차감 → 포인트 7000 | [ ] |
-| `deductPoint` — 잔액 정확히 일치 | 5000에서 5000 차감 → 포인트 0 | [ ] |
-| `deductPoint` — 잔액 부족 | 1000에서 5000 차감 → `IllegalArgumentException` | [ ] |
-| `deductPoint` — 0 이하 금액 | 0 차감 → `IllegalArgumentException` | [ ] |
+| `chargePoint` — 정상 충전 | 1000 충전 → 포인트 1000 | [x] |
+| `chargePoint` — 0 이하 금액 | 0 충전 → `IllegalArgumentException` | [x] |
+| `chargePoint` — 음수 금액 | -100 충전 → `IllegalArgumentException` | [x] |
+| `deductPoint` — 정상 차감 | 10000에서 3000 차감 → 포인트 7000 | [x] |
+| `deductPoint` — 잔액 정확히 일치 | 5000에서 5000 차감 → 포인트 0 | [x] |
+| `deductPoint` — 잔액 부족 | 1000에서 5000 차감 → `IllegalArgumentException` | [x] |
+| `deductPoint` — 0 이하 금액 | 0 차감 → `IllegalArgumentException` | [x] |
 
 ### 2. `Option` 단위 테스트 (`OptionTest`) — 4개 케이스
 
