@@ -1,5 +1,6 @@
 package gift.member;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,8 @@ public class Member {
 
     private String email;
 
-    private String password;
+    @Embedded
+    private Password password;
 
     private String kakaoAccessToken;
 
@@ -28,18 +30,25 @@ public class Member {
     protected Member() {
     }
 
-    public Member(String email, String password) {
+    public Member(String email, String rawPassword) {
         this.email = email;
-        this.password = password;
+        this.password = Password.of(rawPassword);
     }
 
     public Member(String email) {
         this.email = email;
     }
 
-    public void update(String email, String password) {
+    public void update(String email, String rawPassword) {
         this.email = email;
-        this.password = password;
+        this.password = Password.of(rawPassword);
+    }
+
+    public boolean checkPassword(String rawPassword) {
+        if (password == null) {
+            return false;
+        }
+        return password.matches(rawPassword);
     }
 
     public void updateKakaoAccessToken(String kakaoAccessToken) {
@@ -70,10 +79,6 @@ public class Member {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getKakaoAccessToken() {
