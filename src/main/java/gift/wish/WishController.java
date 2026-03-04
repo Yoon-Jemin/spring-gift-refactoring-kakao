@@ -1,7 +1,7 @@
 package gift.wish;
 
 import gift.auth.AuthenticationResolver;
-import gift.product.ProductRepository;
+import gift.member.Member;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,22 +15,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
+
 
 @RestController
 @RequestMapping("/api/wishes")
 public class WishController {
-    private final WishRepository wishRepository;
-    private final ProductRepository productRepository;
+    private final WishService wishService;
     private final AuthenticationResolver authenticationResolver;
 
-    public WishController(
-        WishRepository wishRepository,
-        ProductRepository productRepository,
-        AuthenticationResolver authenticationResolver
-    ) {
-        this.wishRepository = wishRepository;
-        this.productRepository = productRepository;
+    public WishController(WishService wishService, AuthenticationResolver authenticationResolver) {
+        this.wishService = wishService;
         this.authenticationResolver = authenticationResolver;
     }
 
@@ -39,12 +33,8 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         Pageable pageable
     ) {
-        // check auth
-        var member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(401).build();
-        }
-        var wishes = wishRepository.findByMemberId(member.getId(), pageable).map(WishResponse::from);
+        Member member = authenticationResolver.extractMember(authorization);
+        Page<WishResponse> wishes = wishService.getWishes(member.getId(), pageable).map(WishResponse::from);
         return ResponseEntity.ok(wishes);
     }
 
@@ -53,27 +43,9 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody WishRequest request
     ) {
-        // check auth
-        var member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(401).build();
-        }
-
-        // check product
-        var product = productRepository.findById(request.productId()).orElse(null);
-        if (product == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // check duplicate
-        var existing = wishRepository.findByMemberIdAndProductId(member.getId(), product.getId()).orElse(null);
-        if (existing != null) {
-            return ResponseEntity.ok(WishResponse.from(existing));
-        }
-
-        var saved = wishRepository.save(new Wish(member.getId(), product));
-        return ResponseEntity.created(URI.create("/api/wishes/" + saved.getId()))
-            .body(WishResponse.from(saved));
+        Member member = authenticationResolver.extractMember(authorization);
+        Wish wish = wishService.addWish(member.getId(), request.productId());
+        return ResponseEntity.ok(WishResponse.from(wish));
     }
 
     @DeleteMapping("/{id}")
@@ -81,22 +53,8 @@ public class WishController {
         @RequestHeader("Authorization") String authorization,
         @PathVariable Long id
     ) {
-        // check auth
-        var member = authenticationResolver.extractMember(authorization);
-        if (member == null) {
-            return ResponseEntity.status(401).build();
-        }
-
-        var wish = wishRepository.findById(id).orElse(null);
-        if (wish == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!wish.getMemberId().equals(member.getId())) {
-            return ResponseEntity.status(403).build();
-        }
-
-        wishRepository.delete(wish);
+        Member member = authenticationResolver.extractMember(authorization);
+        wishService.removeWish(member.getId(), id);
         return ResponseEntity.noContent().build();
     }
 }

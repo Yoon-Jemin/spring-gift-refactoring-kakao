@@ -1,8 +1,8 @@
 package gift.auth;
 
+import gift.exception.UnauthorizedException;
 import gift.member.Member;
 import gift.member.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +16,6 @@ public class AuthenticationResolver {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-    @Autowired
     public AuthenticationResolver(JwtProvider jwtProvider, MemberRepository memberRepository) {
         this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
@@ -24,11 +23,14 @@ public class AuthenticationResolver {
 
     public Member extractMember(String authorization) {
         try {
-            final String token = authorization.replace("Bearer ", "");
-            final String email = jwtProvider.getEmail(token);
-            return memberRepository.findByEmail(email).orElse(null);
+            String token = authorization.replace("Bearer ", "");
+            String email = jwtProvider.getEmail(token);
+            return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("회원을 찾을 수 없습니다."));
+        } catch (UnauthorizedException e) {
+            throw e;
         } catch (Exception e) {
-            return null;
+            throw new UnauthorizedException("유효하지 않은 인증 정보입니다.");
         }
     }
 }
