@@ -400,3 +400,4 @@ src/test/resources/features/
 - [x] **영속 엔티티의 불필요한 `save()` 호출 제거 — JPA 더티 체킹 활용 (`MemberService`, `OrderService`)**
 - [x] **OAuth 로그인 추상화** — `OAuthLoginClient` 인터페이스 도입, `OAuthLoginService`로 로그인 흐름 캡슐화, `Member` 필드명 일반화 (`kakaoAccessToken` → `oauthAccessToken`)
 - [x] **주문 메시지 전송 전략 패턴 추상화** — `OrderMessageClient` 인터페이스 도입, `OrderService`의 `KakaoMessageClient` 직접 의존 제거
+- [x] **ProductService 중복 메서드 통합 및 `@Transactional` 적용** — `saveProduct` overload 2개 제거 후 `createProduct`/`updateProduct`로 통합, 읽기 메서드에 `readOnly`, `updateProduct`에서 dirty checking 활용
