@@ -42,9 +42,7 @@ public class OrderService {
             .orElseThrow(() -> new NoSuchElementException("옵션이 존재하지 않습니다. id=" + optionId));
 
         option.subtractQuantity(quantity);
-
-        int price = option.getProduct().getPrice() * quantity;
-        member.deductPoint(price);
+        member.deductPoint(option.calculatePrice(quantity));
 
         Order saved = orderRepository.save(new Order(option, member.getId(), quantity, message));
 

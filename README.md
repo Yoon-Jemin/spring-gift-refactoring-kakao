@@ -404,3 +404,4 @@ src/test/resources/features/
 - [x] **AuthenticationResolver의 MemberRepository 직접 참조를 MemberService로 교체** — 레이어드 아키텍처 원칙에 따라 Resolver가 Repository를 우회하지 않고 서비스 계층을 통해 회원을 조회하도록 변경
 - [x] **`@Login` 애노테이션 + HandlerMethodArgumentResolver 도입** — `AuthenticationResolver`를 `HandlerMethodArgumentResolver`로 변환하고 `@Login Member member` 파라미터로 인증된 회원을 자동 주입하여 컨트롤러의 인증 보일러플레이트 제거
 - [x] **OptionService `@Transactional` 적용** — 읽기 메서드에 `readOnly = true`, CUD 메서드에 `@Transactional`을 적용하여 트랜잭션 경계를 명시하고 DB 최적화 및 데이터 정합성 보장
+- [x] **Option 엔티티에 `calculatePrice` 메서드 추가** — `option.getProduct().getPrice() * quantity` 계산을 `option.calculatePrice(quantity)`로 캡슐화하여 디미터 법칙을 준수하고 `OrderService.createOrder`의 추상화 레벨을 통일
