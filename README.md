@@ -401,3 +401,4 @@ src/test/resources/features/
 - [x] **OAuth 로그인 추상화** — `OAuthLoginClient` 인터페이스 도입, `OAuthLoginService`로 로그인 흐름 캡슐화, `Member` 필드명 일반화 (`kakaoAccessToken` → `oauthAccessToken`)
 - [x] **주문 메시지 전송 전략 패턴 추상화** — `OrderMessageClient` 인터페이스 도입, `OrderService`의 `KakaoMessageClient` 직접 의존 제거
 - [x] **ProductService 중복 메서드 통합 및 `@Transactional` 적용** — `saveProduct` overload 2개 제거 후 `createProduct`/`updateProduct`로 통합, 읽기 메서드에 `readOnly`, `updateProduct`에서 dirty checking 활용
+- [x] **AuthenticationResolver의 MemberRepository 직접 참조를 MemberService로 교체** — 레이어드 아키텍처 원칙에 따라 Resolver가 Repository를 우회하지 않고 서비스 계층을 통해 회원을 조회하도록 변경

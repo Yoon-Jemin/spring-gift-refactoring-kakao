@@ -51,6 +51,11 @@ public class MemberService {
         member.chargePoint(amount);
     }
 
+    public Member getMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. email=" + email));
+    }
+
     public void deleteMember(Long id) {
         memberRepository.deleteById(id);
     }
