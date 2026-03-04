@@ -38,13 +38,6 @@ public class MemberService {
             .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id=" + id));
     }
 
-    public boolean existsByEmail(String email) {
-        return memberRepository.existsByEmail(email);
-    }
-
-    public void saveMember(String email, String password) {
-        memberRepository.save(new Member(email, password));
-    }
 
     public void updateMember(Long id, String email, String password) {
         Member member = getMember(id);
