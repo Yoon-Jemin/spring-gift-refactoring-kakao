@@ -15,16 +15,16 @@ import java.util.NoSuchElementException;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OptionRepository optionRepository;
-    private final KakaoMessageClient kakaoMessageClient;
+    private final OrderMessageClient messageClient;
 
     public OrderService(
         OrderRepository orderRepository,
         OptionRepository optionRepository,
-        KakaoMessageClient kakaoMessageClient
+        OrderMessageClient messageClient
     ) {
         this.orderRepository = orderRepository;
         this.optionRepository = optionRepository;
-        this.kakaoMessageClient = kakaoMessageClient;
+        this.messageClient = messageClient;
     }
 
     public Page<Order> getOrders(Long memberId, Pageable pageable) {
@@ -43,17 +43,17 @@ public class OrderService {
 
         Order saved = orderRepository.save(new Order(option, member.getId(), quantity, message));
 
-        sendKakaoMessageIfPossible(member, saved, option);
+        sendMessageIfPossible(member, saved, option);
         return saved;
     }
 
-    private void sendKakaoMessageIfPossible(Member member, Order order, Option option) {
+    private void sendMessageIfPossible(Member member, Order order, Option option) {
         if (member.getOAuthAccessToken() == null) {
             return;
         }
         try {
             Product product = option.getProduct();
-            kakaoMessageClient.sendToMe(member.getOAuthAccessToken(), order, product);
+            messageClient.sendToMe(member.getOAuthAccessToken(), order, product);
         } catch (Exception ignored) {
         }
     }

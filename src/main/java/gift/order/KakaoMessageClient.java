@@ -6,7 +6,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 
 @Component
-public class KakaoMessageClient {
+public class KakaoMessageClient implements OrderMessageClient {
     private final RestClient restClient;
 
     public KakaoMessageClient(RestClient.Builder builder) {

@@ -35,7 +35,7 @@ class OrderServiceTest {
     private OptionRepository optionRepository;
 
     @Mock
-    private KakaoMessageClient kakaoMessageClient;
+    private OrderMessageClient messageClient;
 
     @InjectMocks
     private OrderService orderService;
@@ -103,7 +103,7 @@ class OrderServiceTest {
 
         orderService.createOrder(member, 1L, 1, "");
 
-        then(kakaoMessageClient).should(never()).sendToMe(anyString(), any(Order.class), any(Product.class));
+        then(messageClient).should(never()).sendToMe(anyString(), any(Order.class), any(Product.class));
     }
 
     @Test
@@ -113,7 +113,7 @@ class OrderServiceTest {
         given(optionRepository.findById(1L)).willReturn(Optional.of(option));
         given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
         doThrow(new RuntimeException("카카오 API 오류"))
-            .when(kakaoMessageClient).sendToMe(eq("kakao-token"), any(Order.class), any(Product.class));
+            .when(messageClient).sendToMe(eq("kakao-token"), any(Order.class), any(Product.class));
 
         Order order = orderService.createOrder(member, 1L, 2, "선물");
 
