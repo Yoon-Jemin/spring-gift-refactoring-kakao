@@ -1,7 +1,6 @@
 package gift.order;
 
 import gift.member.Member;
-import gift.member.MemberRepository;
 import gift.option.Option;
 import gift.option.OptionRepository;
 import gift.product.Product;
@@ -16,18 +15,15 @@ import java.util.NoSuchElementException;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OptionRepository optionRepository;
-    private final MemberRepository memberRepository;
     private final KakaoMessageClient kakaoMessageClient;
 
     public OrderService(
         OrderRepository orderRepository,
         OptionRepository optionRepository,
-        MemberRepository memberRepository,
         KakaoMessageClient kakaoMessageClient
     ) {
         this.orderRepository = orderRepository;
         this.optionRepository = optionRepository;
-        this.memberRepository = memberRepository;
         this.kakaoMessageClient = kakaoMessageClient;
     }
 
@@ -41,11 +37,9 @@ public class OrderService {
             .orElseThrow(() -> new NoSuchElementException("옵션이 존재하지 않습니다. id=" + optionId));
 
         option.subtractQuantity(quantity);
-        optionRepository.save(option);
 
         int price = option.getProduct().getPrice() * quantity;
         member.deductPoint(price);
-        memberRepository.save(member);
 
         Order saved = orderRepository.save(new Order(option, member.getId(), quantity, message));
 

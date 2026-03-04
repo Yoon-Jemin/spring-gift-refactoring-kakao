@@ -1,6 +1,7 @@
 package gift.member;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,17 +39,16 @@ public class MemberService {
             .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id=" + id));
     }
 
-
+    @Transactional
     public void updateMember(Long id, String email, String password) {
         Member member = getMember(id);
         member.update(email, password);
-        memberRepository.save(member);
     }
 
+    @Transactional
     public void chargePoint(Long id, int amount) {
         Member member = getMember(id);
         member.chargePoint(amount);
-        memberRepository.save(member);
     }
 
     public void deleteMember(Long id) {

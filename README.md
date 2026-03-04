@@ -397,3 +397,4 @@ src/test/resources/features/
 
 - [x] **Password 일급객체 도입 및 BCrypt 해싱 적용**
 - [x] **MemberService 중복 메서드 통일**
+- [x] **영속 엔티티의 불필요한 `save()` 호출 제거 — JPA 더티 체킹 활용 (`MemberService`, `OrderService`)**

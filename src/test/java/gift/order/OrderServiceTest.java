@@ -1,7 +1,6 @@
 package gift.order;
 
 import gift.member.Member;
-import gift.member.MemberRepository;
 import gift.option.Option;
 import gift.option.OptionRepository;
 import gift.product.Product;
@@ -36,9 +35,6 @@ class OrderServiceTest {
     private OptionRepository optionRepository;
 
     @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
     private KakaoMessageClient kakaoMessageClient;
 
     @InjectMocks
@@ -67,8 +63,6 @@ class OrderServiceTest {
         assertThat(option.getQuantity()).isEqualTo(7);
         assertThat(member.getPoint()).isEqualTo(100000 - 4500 * 3);
         assertThat(order.getQuantity()).isEqualTo(3);
-        then(optionRepository).should().save(option);
-        then(memberRepository).should().save(member);
         then(orderRepository).should().save(any(Order.class));
     }
 
