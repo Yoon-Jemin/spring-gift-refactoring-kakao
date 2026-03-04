@@ -398,3 +398,4 @@ src/test/resources/features/
 - [x] **Password 일급객체 도입 및 BCrypt 해싱 적용**
 - [x] **MemberService 중복 메서드 통일**
 - [x] **영속 엔티티의 불필요한 `save()` 호출 제거 — JPA 더티 체킹 활용 (`MemberService`, `OrderService`)**
+- [x] **OAuth 로그인 추상화** — `OAuthLoginClient` 인터페이스 도입, `OAuthLoginService`로 로그인 흐름 캡슐화, `Member` 필드명 일반화 (`kakaoAccessToken` → `oauthAccessToken`)

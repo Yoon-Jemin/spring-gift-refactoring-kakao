@@ -48,12 +48,12 @@ public class OrderService {
     }
 
     private void sendKakaoMessageIfPossible(Member member, Order order, Option option) {
-        if (member.getKakaoAccessToken() == null) {
+        if (member.getOAuthAccessToken() == null) {
             return;
         }
         try {
             Product product = option.getProduct();
-            kakaoMessageClient.sendToMe(member.getKakaoAccessToken(), order, product);
+            kakaoMessageClient.sendToMe(member.getOAuthAccessToken(), order, product);
         } catch (Exception ignored) {
         }
     }
