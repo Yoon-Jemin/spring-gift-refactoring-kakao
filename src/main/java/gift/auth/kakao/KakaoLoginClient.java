@@ -1,4 +1,6 @@
-package gift.auth;
+package gift.auth.kakao;
+
+import gift.auth.OAuthLoginClient;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;

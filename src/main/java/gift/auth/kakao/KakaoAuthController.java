@@ -1,4 +1,7 @@
-package gift.auth;
+package gift.auth.kakao;
+
+import gift.auth.OAuthLoginService;
+import gift.auth.TokenResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
