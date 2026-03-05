@@ -433,7 +433,9 @@ src/test/resources/features/
 
 기존 코드에 의도가 남아 있었지만 구현되지 않은 작동을 완료한다.
 
-- [x] 1단계에서 `OrderController`의 미구현 위시 정리 의도(`WishRepository` 의존성)는 이미 제거 완료.
+- [x] **주문 완료 시 위시리스트 자동 제거** — `OrderService.createOrder()`에서 주문 저장 후 해당 상품이 회원의 위시리스트에 있으면 자동 제거. 1단계에서 `OrderController`에 남아 있던 미구현 의도를 서비스 계층에서 구현.
+  - 변경 전: 주문 완료 후 위시리스트에 해당 상품이 그대로 남아 있음
+  - 변경 후: `wishRepository.deleteByMemberIdAndProductId(memberId, productId)` 호출로 자동 정리
 
 ---
 
@@ -444,15 +446,15 @@ src/test/resources/features/
 - [x] **Option.calculatePrice() 도입** — `OrderService`에서 `option.getProduct().getPrice() * quantity`로 직접 계산하던 로직을 `option.calculatePrice(quantity)`로 캡슐화. 디미터 법칙 위반을 해소하고 가격 계산 책임을 도메인 엔티티로 이동.
   - 변경 전: `int price = option.getProduct().getPrice() * quantity;` (서비스에서 내부 구조 노출)
   - 변경 후: `int price = option.calculatePrice(quantity);` (도메인 메서드 호출)
-- [x] **Password 일급객체 도입** — `MemberService`에서 `BCryptPasswordEncoder`로 직접 인코딩/매칭하던 로직을 `Password` 값 객체로 캡슐화. 암호화 전략이 도메인 내부에 숨겨지고, `Member.checkPassword()`로 비밀번호 검증 책임이 엔티티로 이동.
-  - 변경 전: `encoder.encode(rawPassword)` / `encoder.matches(raw, encoded)` (서비스에서 직접 처리)
+- [x] **Password 일급객체 도입** — `MemberService`에서 비밀번호 값을 꺼내 평문 비교하던 로직을 `Password` 값 객체로 캡슐화. 암호화 전략이 도메인 내부에 숨겨지고, `Member.checkPassword()`로 비밀번호 검증 책임이 엔티티로 이동.
+  - 변경 전: `member.getPassword() == null || !member.getPassword().equals(password)` (서비스에서 직접 처리)
   - 변경 후: `Password.of(rawPassword)` / `member.checkPassword(rawPassword)` (도메인 캡슐화)
 
 ---
 
-### ADR
+## ADR
 
-#### 트랜잭션 경계 세우기 — 메서드 단위 `@Transactional` 적용
+### 1. 트랜잭션 경계 세우기 — 메서드 단위 `@Transactional` 적용
 
 **맥락**
 
@@ -473,7 +475,9 @@ Spring Data JPA의 `SimpleJpaRepository`는 개별 레포지토리 메서드에 
 - 메서드 시그니처에 트랜잭션 속성이 명시되므로, 해당 메서드가 데이터를 변경하는지 조회만 하는지 코드만으로 판단할 수 있다.
 - 이미 `ProductService`, `OptionService`, `OrderService`가 이 패턴을 사용하고 있으므로 프로젝트 전체의 일관성을 유지한다.
 
-#### 인터페이스 사용 전략 — 외부 연동 경계에만 인터페이스 도입
+---
+
+### 2. 인터페이스 사용 전략 — 외부 연동 경계에만 인터페이스 도입
 
 **맥락**
 
@@ -497,7 +501,9 @@ Spring 프레임워크에서는 DI를 활용하기 위해 "모든 서비스에 �
 - Spring의 CGLIB 프록시는 구체 클래스도 프록시할 수 있으므로, `@Transactional` 등 AOP 적용을 위해 인터페이스가 필수적이지 않다.
 - Mockito 등 테스트 프레임워크도 구체 클래스 모킹을 지원하므로, 테스트를 위해 인터페이스를 만들 필요가 없다.
 
-#### 도메인 책임 되찾기 — 계산·판단 로직을 엔티티와 값 객체로 이동
+---
+
+### 3. 도메인 책임 되찾기 — 계산·판단 로직을 엔티티와 값 객체로 이동
 
 **맥락**
 
@@ -520,3 +526,5 @@ Spring 프레임워크에서는 DI를 활용하기 위해 "모든 서비스에 �
 - 가격 계산은 `Option`이 자신의 연관 객체(`Product`)를 통해 수행하는 것이 자연스럽다. `option.calculatePrice(quantity)`로 캡슐화하면 서비스가 `Option`의 내부 구조를 알 필요가 없어지고, 가격 계산 정책이 변경되더라도 `Option` 한 곳만 수정하면 된다.
 - 비밀번호 인코딩·매칭은 `Password` 값 객체(`@Embeddable`)로 캡슐화하면 암호화 전략(`BCryptPasswordEncoder`)이 도메인 내부에 숨겨진다. `Member.checkPassword(rawPassword)`로 비밀번호 검증 책임이 엔티티로 이동하여, 서비스는 인증 흐름만 조율한다.
 - 두 변경 모두 서비스의 추상화 레벨을 통일하는 효과가 있다. `createOrder` 메서드가 "재고 차감 → 포인트 차감 → 주문 저장"이라는 비즈니스 흐름을 균일한 수준으로 표현하게 된다.
+
+---

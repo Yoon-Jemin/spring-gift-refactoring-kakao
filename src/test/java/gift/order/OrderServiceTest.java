@@ -4,6 +4,7 @@ import gift.member.Member;
 import gift.option.Option;
 import gift.option.OptionRepository;
 import gift.product.Product;
+import gift.wish.WishRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class OrderServiceTest {
 
     @Mock
     private OptionRepository optionRepository;
+
+    @Mock
+    private WishRepository wishRepository;
 
     @Mock
     private OrderMessageClient messageClient;

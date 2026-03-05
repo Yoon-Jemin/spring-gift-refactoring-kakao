@@ -4,6 +4,7 @@ import gift.member.Member;
 import gift.option.Option;
 import gift.option.OptionRepository;
 import gift.product.Product;
+import gift.wish.WishRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,18 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OptionRepository optionRepository;
+    private final WishRepository wishRepository;
     private final OrderMessageClient messageClient;
 
     public OrderService(
         OrderRepository orderRepository,
         OptionRepository optionRepository,
+        WishRepository wishRepository,
         OrderMessageClient messageClient
     ) {
         this.orderRepository = orderRepository;
         this.optionRepository = optionRepository;
+        this.wishRepository = wishRepository;
         this.messageClient = messageClient;
     }
 
@@ -45,6 +49,7 @@ public class OrderService {
         member.deductPoint(option.calculatePrice(quantity));
 
         Order saved = orderRepository.save(new Order(option, member.getId(), quantity, message));
+        wishRepository.deleteByMemberIdAndProductId(member.getId(), option.getProduct().getId());
 
         sendMessageIfPossible(member, saved, option);
         return saved;
