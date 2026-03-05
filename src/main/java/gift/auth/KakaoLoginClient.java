@@ -1,7 +1,5 @@
 package gift.auth;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
@@ -44,19 +42,4 @@ public class KakaoLoginClient implements OAuthLoginClient {
         return response.email();
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record KakaoTokenResponse(@JsonProperty("access_token") String accessToken) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record KakaoUserResponse(@JsonProperty("kakao_account") KakaoAccount kakaoAccount) {
-
-        public String email() {
-            return kakaoAccount.email();
-        }
-
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        public record KakaoAccount(String email) {
-        }
-    }
 }
