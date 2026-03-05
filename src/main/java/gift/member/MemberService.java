@@ -14,6 +14,7 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional
     public Member register(String email, String password) {
         if (memberRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");
@@ -21,6 +22,7 @@ public class MemberService {
         return memberRepository.save(new Member(email, password));
     }
 
+    @Transactional(readOnly = true)
     public Member login(String email, String password) {
         Member member = memberRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
@@ -30,10 +32,12 @@ public class MemberService {
         return member;
     }
 
+    @Transactional(readOnly = true)
     public List<Member> getAllMembers() {
         return memberRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Member getMember(Long id) {
         return memberRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id=" + id));
@@ -51,11 +55,13 @@ public class MemberService {
         member.chargePoint(amount);
     }
 
+    @Transactional(readOnly = true)
     public Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
             .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. email=" + email));
     }
 
+    @Transactional
     public void deleteMember(Long id) {
         memberRepository.deleteById(id);
     }

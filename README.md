@@ -390,9 +390,6 @@ src/test/resources/features/
 - **AI 산출물 검증의 필요성**: AI가 생성한 경계값 테스트 문자열이 정확히 50자여서 테스트가 실패하는 사례를 통해, AI 산출물을 반드시 실행·검증해야 한다는 점을 재확인함
 - **커밋 단위 분리**: 구조 변경과 작동 변경을 한 커밋에 섞지 않고, 목적 1개로 커밋을 구성하는 습관이 코드 리뷰와 롤백에 유리함을 실감함
 
-
-## 2단계 - 리팩터링 완성하기
-
 ### 1단계 페어(paul.an) 코드 리뷰 반영
 
 - [x] **Password 일급객체 도입 및 BCrypt 해싱 적용**
@@ -405,3 +402,72 @@ src/test/resources/features/
 - [x] **`@Login` 애노테이션 + HandlerMethodArgumentResolver 도입** — `AuthenticationResolver`를 `HandlerMethodArgumentResolver`로 변환하고 `@Login Member member` 파라미터로 인증된 회원을 자동 주입하여 컨트롤러의 인증 보일러플레이트 제거
 - [x] **OptionService `@Transactional` 적용** — 읽기 메서드에 `readOnly = true`, CUD 메서드에 `@Transactional`을 적용하여 트랜잭션 경계를 명시하고 DB 최적화 및 데이터 정합성 보장
 - [x] **Option 엔티티에 `calculatePrice` 메서드 추가** — `option.getProduct().getPrice() * quantity` 계산을 `option.calculatePrice(quantity)`로 캡슐화하여 디미터 법칙을 준수하고 `OrderService.createOrder`의 추상화 레벨을 통일
+
+---
+
+
+## 2단계 - 리팩터링 완성하기
+
+### 2단계 기능 요구 사항 분석
+
+> 핵심 목표: 작동 변경을 안전하게 수행하고, 그 결과를 증거로 보여준다.
+
+---
+
+### 트랜잭션 경계 세우기
+
+여러 저장 작업이 하나의 논리 작업이라면, 중간 실패에서 부분 반영이 발생하지 않도록 경계를 설정한다.
+
+- [x] **OrderService** — `createOrder`에 `@Transactional` 적용 (재고 차감 → 포인트 차감 → 주문 저장이 원자적으로 처리)
+- [x] **ProductService** — CUD 메서드에 `@Transactional`, 읽기 메서드에 `readOnly = true` 적용
+- [x] **OptionService** — CUD 메서드에 `@Transactional`, 읽기 메서드에 `readOnly = true` 적용
+- [x] **OAuthLoginService** — `login()`에 `@Transactional` 적용 (회원 조회/생성 + 토큰 업데이트가 원자적으로 처리)
+- [x] **CategoryService** — CUD 메서드에 `@Transactional`, 읽기 메서드에 `readOnly = true` 적용. `updateCategory()`에서 `save()` 호출 제거하여 더티 체킹 활용 (기존 `ProductService.updateProduct` 패턴과 동일)
+- [x] **MemberService** — `register()`, `deleteMember()`에 `@Transactional`, `login()`, `getAllMembers()`, `getMember()`, `getMemberByEmail()`에 `readOnly = true` 적용
+- [x] **WishService** — `addWish()`, `removeWish()`에 `@Transactional`, `getWishes()`에 `readOnly = true` 적용
+
+---
+
+### 누락된 작동 구현
+
+기존 코드에 의도가 남아 있었지만 구현되지 않은 작동을 완료한다.
+
+- [x] 1단계에서 `OrderController`의 미구현 위시 정리 의도(`WishRepository` 의존성)는 이미 제거 완료.
+
+---
+
+### 도메인 책임 되찾기
+
+작동을 유지하면서도 책임과 계산, 판단을 올바른 위치로 이동해 누수와 중복을 줄인다. 변경 전후가 분명한 개선을 최소 2개 이상 수행한다.
+
+- [x] **Option.calculatePrice() 도입** — `OrderService`에서 `option.getProduct().getPrice() * quantity`로 직접 계산하던 로직을 `option.calculatePrice(quantity)`로 캡슐화. 디미터 법칙 위반을 해소하고 가격 계산 책임을 도메인 엔티티로 이동.
+  - 변경 전: `int price = option.getProduct().getPrice() * quantity;` (서비스에서 내부 구조 노출)
+  - 변경 후: `int price = option.calculatePrice(quantity);` (도메인 메서드 호출)
+- [x] **Password 일급객체 도입** — `MemberService`에서 `BCryptPasswordEncoder`로 직접 인코딩/매칭하던 로직을 `Password` 값 객체로 캡슐화. 암호화 전략이 도메인 내부에 숨겨지고, `Member.checkPassword()`로 비밀번호 검증 책임이 엔티티로 이동.
+  - 변경 전: `encoder.encode(rawPassword)` / `encoder.matches(raw, encoded)` (서비스에서 직접 처리)
+  - 변경 후: `Password.of(rawPassword)` / `member.checkPassword(rawPassword)` (도메인 캡슐화)
+
+---
+
+### ADR
+
+#### 트랜잭션 경계 세우기 — 메서드 단위 `@Transactional` 적용
+
+**맥락**
+
+Spring Data JPA의 `SimpleJpaRepository`는 개별 레포지토리 메서드에 `@Transactional`을 선언한다. 서비스 메서드에 별도 트랜잭션을 선언하지 않으면 레포지토리 호출마다 독립 트랜잭션이 열리므로, 하나의 비즈니스 작업 안에서 여러 레포지토리를 호출할 때 중간 실패 시 부분 반영이 발생할 수 있다.
+
+**선택지**
+
+| | 방식 | 장점 | 단점 |
+|---|---|---|---|
+| A | 클래스 레벨 `@Transactional` | 선언 한 줄로 전체 적용, 누락 위험 없음 | 읽기 메서드까지 쓰기 트랜잭션으로 실행되어 불필요한 더티 체킹 발생, `readOnly` 최적화 불가 |
+| B | 메서드 레벨 `@Transactional` | CUD와 읽기를 구분하여 `readOnly = true` 적용 가능, 메서드별 의도 명시 | 메서드마다 어노테이션을 붙여야 하므로 누락 가능성 존재 |
+
+**결정**: B안 — 메서드 레벨 적용
+
+**근거**
+
+- 읽기 메서드에 `readOnly = true`를 적용하면 Hibernate 플러시 모드가 `MANUAL`로 설정되어 더티 체킹을 건너뛰고, JDBC 드라이버에 읽기 전용 힌트를 전달하여 DB 수준 최적화(리플리카 라우팅 등)가 가능하다.
+- 메서드 시그니처에 트랜잭션 속성이 명시되므로, 해당 메서드가 데이터를 변경하는지 조회만 하는지 코드만으로 판단할 수 있다.
+- 이미 `ProductService`, `OptionService`, `OrderService`가 이 패턴을 사용하고 있으므로 프로젝트 전체의 일관성을 유지한다.
