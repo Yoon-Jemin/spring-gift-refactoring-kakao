@@ -19,6 +19,7 @@ public class KakaoMessageClient implements OrderMessageClient {
         var params = new LinkedMultiValueMap<String, String>();
         params.add("template_object", templateObject);
 
+        // 타임아웃 전략 추가
         restClient.post()
             .uri("https://kapi.kakao.com/v2/api/talk/memo/default/send")
             .header("Authorization", "Bearer " + accessToken)

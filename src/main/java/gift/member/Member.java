@@ -44,11 +44,10 @@ public class Member {
         this.password = Password.of(rawPassword);
     }
 
-    public boolean checkPassword(String rawPassword) {
-        if (password == null) {
-            return false;
+    public void authenticate(String rawPassword) {
+        if (password == null || !password.matches(rawPassword)) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
-        return password.matches(rawPassword);
     }
 
     public void updateOAuthAccessToken(String oauthAccessToken) {
